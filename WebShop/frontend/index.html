@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Shop — Items, Cart, Orders, Favorites, Stats</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <div class="app" id="app">
+        <!-- HEADER -->
+        <div class="header">
+            <div class="header-left">
+                <h1>🛍️ Shop</h1>
+                <div class="subhead">Items · Cart · Orders · Favorites · Stats</div>
+            </div>
+            <div class="header-right">
+                <button class="badge-cart" id="cartBadge" style="display:none;" onclick="switchTab('cart')">
+                    🛒 <span id="cartCountBadge">0</span>
+                </button>
+                <div class="api-status">
+                    <span class="status-dot" id="statusDot"></span>
+                    <span id="statusText">API…</span>
+                </div>
+                <!-- Profile Dropdown -->
+                <div class="profile-dropdown" id="profileDropdown" style="display:none;">
+                    <button class="profile-btn" id="profileBtn">
+                        <span class="profile-avatar-small" id="profileAvatar">👤</span>
+                        <span id="profileNameShort">User</span>
+                        <span style="font-size:0.7rem; color:#94a3b8;">▾</span>
+                    </button>
+                    <div class="profile-dropdown-content" id="dropdownContent">
+                        <div class="dropdown-header">
+                            <div class="username" id="dropdownUsername">Username</div>
+                            <div class="user-type" id="dropdownUserType">Buyer</div>
+                        </div>
+                        <button class="dropdown-item" data-tab="profile">👤 My Profile</button>
+                        <button class="dropdown-item" data-tab="orders">📋 Orders</button>
+                        <button class="dropdown-item" data-tab="favorites">❤️ Favorites</button>
+                        <button class="dropdown-item seller-only" data-tab="stats" style="display:none;">📊 Stats</button>
+                        <div class="dropdown-divider"></div>
+                        <button class="dropdown-item danger" id="dropdownLogout">🚪 Logout</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- AUTH SECTION -->
+        <div id="authSection" class="auth-section">
+            <div class="auth-container">
+                <div class="auth-tabs">
+                    <button class="auth-tab active" data-auth="login">Login</button>
+                    <button class="auth-tab" data-auth="register">Register</button>
+                </div>
+                <div id="loginForm" class="auth-form active">
+                    <h3>Welcome Back</h3>
+                    <div class="form-group">
+                        <label for="loginUsername">Username</label>
+                        <input type="text" id="loginUsername" placeholder="Enter username" />
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword">Password</label>
+                        <input type="password" id="loginPassword" placeholder="Enter password" />
+                    </div>
+                    <button class="btn btn-primary" id="loginBtn">Login</button>
+                    <div id="loginMessage" class="auth-message"></div>
+                </div>
+                <div id="registerForm" class="auth-form">
+                    <h3>Create Account</h3>
+                    <div class="form-group">
+                        <label for="registerUsername">Username</label>
+                        <input type="text" id="registerUsername" placeholder="Choose username" />
+                    </div>
+                    <div class="form-group">
+                        <label for="registerPassword">Password</label>
+                        <input type="password" id="registerPassword" placeholder="Choose password" />
+                    </div>
+                    <div class="form-group">
+                        <label for="registerSeller">Account Type</label>
+                        <select id="registerSeller">
+                            <option value="false">Buyer</option>
+                            <option value="true">Seller</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="shopNameGroup" style="display:none;">
+                        <label for="registerShopName">Shop Name</label>
+                        <input type="text" id="registerShopName" placeholder="Enter your shop name" />
+                    </div>
+                    <button class="btn btn-primary" id="registerBtn">Register</button>
+                    <div id="registerMessage" class="auth-message"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MAIN CONTENT -->
+        <div id="mainContent" style="display:none;">
+            <!-- TABS -->
+            <div class="tabs" role="tablist">
+                <button class="tab-btn active" data-tab="items">📦 Items</button>
+                <button class="tab-btn" data-tab="cart">🛒 Cart</button>
+                <button class="tab-btn" data-tab="orders">📋 Orders</button>
+                <button class="tab-btn" data-tab="favorites">❤️ Favorites</button>
+                <button class="tab-btn seller-only" data-tab="stats" style="display:none;">📊 Stats</button>
+            </div>
+
+            <!-- PANELS -->
+            <!-- Items -->
+            <div id="items" class="tab-pane active">
+                <div class="flex-row">
+                    <h3 style="font-weight: 500;">Available Items</h3>
+                    <div>
+                        <button class="btn btn-ghost" id="refreshItemsBtn">↺ Refresh</button>
+                        <button class="btn btn-primary" id="addItemBtn" style="display:none; width:auto;">➕ Add Item</button>
+                    </div>
+                </div>
+                <div class="product-grid" id="itemGrid"></div>
+            </div>
+
+            <!-- Cart -->
+            <div id="cart" class="tab-pane">
+                <div class="flex-row">
+                    <h3 style="font-weight: 500;">Your Cart</h3>
+                    <div>
+                        <button class="btn btn-ghost" id="selectAllBtn" style="display:none;">✅ Select All</button>
+                        <button class="btn btn-ghost" id="clearCartBtn">Clear Cart</button>
+                        <button class="btn btn-primary" id="checkoutBtn" style="display:none; width:auto; margin-left:0.5rem;">🛒 Checkout</button>
+                    </div>
+                </div>
+                <div id="cartItemsContainer"></div>
+                <div style="margin-top: 1.2rem; text-align: right;" id="cartTotal"></div>
+                <div style="margin-top: 1rem; text-align: right; display:none;" id="selectedTotal">
+                    <span class="summary">Selected: $<span id="selectedTotalAmount">0.00</span></span>
+                </div>
+            </div>
+
+            <!-- Orders -->
+            <div id="orders" class="tab-pane">
+                <h3 style="font-weight: 500; margin-bottom: 0.8rem;">Order History</h3>
+                <div id="ordersContainer"></div>
+            </div>
+
+            <!-- Favorites -->
+            <div id="favorites" class="tab-pane">
+                <h3 style="font-weight: 500; margin-bottom: 0.8rem;">Your Favorite Items</h3>
+                <div id="favoritesContainer"></div>
+            </div>
+
+            <!-- Stats (Seller only) -->
+            <div id="stats" class="tab-pane">
+                <h3 style="font-weight: 500; margin-bottom: 1rem;">📊 Seller Statistics</h3>
+                <div class="stats-grid" id="statsGrid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalSales">0</div>
+                        <div class="stat-label">Total Sales</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalRevenue">$0</div>
+                        <div class="stat-label">Total Revenue</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalItems">0</div>
+                        <div class="stat-label">Items Listed</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="avgOrder">$0</div>
+                        <div class="stat-label">Average Order</div>
+                    </div>
+                </div>
+                <h4 style="margin: 1.5rem 0 0.8rem;">📈 Sales Chart</h4>
+                <div class="sales-chart" id="salesChart">
+                    <div class="chart-placeholder">Sales data will appear here</div>
+                </div>
+            </div>
+
+            <!-- Profile (hidden tab, accessed via dropdown) -->
+            <div id="profile" class="tab-pane">
+                <div class="profile-container">
+                    <div class="profile-header">
+                        <div class="profile-avatar-large">👤</div>
+                        <div class="profile-info">
+                            <h2 id="profileUsername">Username</h2>
+                            <p id="profileType">Buyer</p>
+                            <p id="profileSince">Member since: --</p>
+                        </div>
+                    </div>
+                    <div class="profile-actions">
+                        <button class="btn btn-ghost" id="editProfileBtn">✏️ Edit Profile</button>
+                        <button class="btn btn-danger" id="deleteAccountBtn">🗑️ Delete Account</button>
+                    </div>
+                    <div id="profileEditForm" style="display:none; margin-top: 1.5rem;">
+                        <h4>Change Username</h4>
+                        <div class="form-group">
+                            <input type="text" id="newUsername" placeholder="New username" />
+                            <input type="password" id="editPassword" placeholder="Current password" style="margin-top:0.5rem;" />
+                            <button class="btn btn-primary" id="saveUsernameBtn" style="width:auto; margin-top: 0.5rem;">Save</button>
+                        </div>
+                        <div id="profileMessage" class="auth-message"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL for adding item -->
+    <div id="addItemModal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <span class="modal-close" id="closeModalBtn">&times;</span>
+            <h3>Add New Item</h3>
+            <div class="form-group">
+                <label>Item Name</label>
+                <input type="text" id="newItemName" placeholder="Enter item name" />
+            </div>
+            <div class="form-group">
+                <label>Price ($)</label>
+                <input type="number" id="newItemPrice" placeholder="0.00" step="0.01" />
+            </div>
+            <button class="btn btn-primary" id="submitItemBtn">Create Item</button>
+            <div id="itemMessage" class="auth-message"></div>
+        </div>
+    </div>
+
+    <!-- MODAL for Product Card -->
+    <div id="productModal" class="modal" style="display:none;">
+        <div class="modal-content product-modal">
+            <span class="modal-close" id="closeProductModal">&times;</span>
+            <div id="productDetail">
+                <div class="product-detail-header">
+                    <div class="product-detail-emoji">📦</div>
+                    <div class="product-detail-info">
+                        <h2 id="detailName">Product Name</h2>
+                        <div class="product-detail-shop">🏪 <span id="detailShop">Shop Name</span></div>
+                        <div class="product-detail-price" id="detailPrice">$0.00</div>
+                    </div>
+                </div>
+                <div class="product-detail-body">
+                    <div class="product-detail-stats">
+                        <div class="stat-item">
+                            <span class="stat-label">⭐ Rating</span>
+                            <span class="stat-value" id="detailRating">0.0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">📝 Reviews</span>
+                            <span class="stat-value" id="detailReviews">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">🏪 Shop</span>
+                            <span class="stat-value" id="detailShopName">Unknown</span>
+                        </div>
+                    </div>
+                    <div class="product-detail-actions">
+                        <button class="btn btn-primary" id="detailAddToCart">🛒 Add to Cart</button>
+                        <button class="btn btn-outline" id="detailFavorite">♡ Add to Favorites</button>
+                    </div>
+
+                    <!-- Add Review Section -->
+                    <div class="product-detail-add-review">
+                        <h4>Write a Review</h4>
+                        <div class="form-group">
+                            <label>Rating</label>
+                            <select id="reviewRating">
+                                <option value="5">⭐⭐⭐⭐⭐ (5)</option>
+                                <option value="4">⭐⭐⭐⭐ (4)</option>
+                                <option value="3">⭐⭐⭐ (3)</option>
+                                <option value="2">⭐⭐ (2)</option>
+                                <option value="1">⭐ (1)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Review</label>
+                            <textarea id="reviewBody" rows="3" placeholder="Write your review here..."></textarea>
+                        </div>
+                        <button class="btn btn-primary" id="submitReviewBtn">Submit Review</button>
+                        <div id="reviewMessage" class="auth-message"></div>
+                    </div>
+
+                    <div class="product-detail-reviews">
+                        <h4>Reviews</h4>
+                        <div id="detailReviewsList">
+                            <div class="empty-message">No reviews yet</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
