@@ -8,7 +8,6 @@
 </head>
 <body>
     <div class="app" id="app">
-        <!-- HEADER -->
         <div class="header">
             <div class="header-left">
                 <h1>🛍️ Shop</h1>
@@ -22,7 +21,6 @@
                     <span class="status-dot" id="statusDot"></span>
                     <span id="statusText">API…</span>
                 </div>
-                <!-- Profile Dropdown -->
                 <div class="profile-dropdown" id="profileDropdown" style="display:none;">
                     <button class="profile-btn" id="profileBtn">
                         <span class="profile-avatar-small" id="profileAvatar">👤</span>
@@ -45,7 +43,6 @@
             </div>
         </div>
 
-        <!-- AUTH SECTION -->
         <div id="authSection" class="auth-section">
             <div class="auth-container">
                 <div class="auth-tabs">
@@ -92,9 +89,7 @@
             </div>
         </div>
 
-        <!-- MAIN CONTENT -->
         <div id="mainContent" style="display:none;">
-            <!-- TABS -->
             <div class="tabs" role="tablist">
                 <button class="tab-btn active" data-tab="items">📦 Items</button>
                 <button class="tab-btn" data-tab="cart">🛒 Cart</button>
@@ -103,8 +98,6 @@
                 <button class="tab-btn seller-only" data-tab="stats" style="display:none;">📊 Stats</button>
             </div>
 
-            <!-- PANELS -->
-            <!-- Items -->
             <div id="items" class="tab-pane active">
                 <div class="flex-row">
                     <h3 style="font-weight: 500;">Available Items</h3>
@@ -116,7 +109,6 @@
                 <div class="product-grid" id="itemGrid"></div>
             </div>
 
-            <!-- Cart -->
             <div id="cart" class="tab-pane">
                 <div class="flex-row">
                     <h3 style="font-weight: 500;">Your Cart</h3>
@@ -133,19 +125,16 @@
                 </div>
             </div>
 
-            <!-- Orders -->
             <div id="orders" class="tab-pane">
                 <h3 style="font-weight: 500; margin-bottom: 0.8rem;">Order History</h3>
                 <div id="ordersContainer"></div>
             </div>
 
-            <!-- Favorites -->
             <div id="favorites" class="tab-pane">
                 <h3 style="font-weight: 500; margin-bottom: 0.8rem;">Your Favorite Items</h3>
                 <div id="favoritesContainer"></div>
             </div>
 
-            <!-- Stats (Seller only) -->
             <div id="stats" class="tab-pane">
                 <h3 style="font-weight: 500; margin-bottom: 1rem;">📊 Seller Statistics</h3>
                 <div class="stats-grid" id="statsGrid">
@@ -172,7 +161,6 @@
                 </div>
             </div>
 
-            <!-- Profile (hidden tab, accessed via dropdown) -->
             <div id="profile" class="tab-pane">
                 <div class="profile-container">
                     <div class="profile-header">
@@ -201,7 +189,6 @@
         </div>
     </div>
 
-    <!-- MODAL for adding item -->
     <div id="addItemModal" class="modal" style="display:none;">
         <div class="modal-content">
             <span class="modal-close" id="closeModalBtn">&times;</span>
@@ -219,7 +206,6 @@
         </div>
     </div>
 
-    <!-- MODAL for Product Card -->
     <div id="productModal" class="modal" style="display:none;">
         <div class="modal-content product-modal">
             <span class="modal-close" id="closeProductModal">&times;</span>
@@ -252,7 +238,6 @@
                         <button class="btn btn-outline" id="detailFavorite">♡ Add to Favorites</button>
                     </div>
 
-                    <!-- Add Review Section -->
                     <div class="product-detail-add-review">
                         <h4>Write a Review</h4>
                         <div class="form-group">
