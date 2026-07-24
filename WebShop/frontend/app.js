@@ -1,10 +1,8 @@
 (function() {
     'use strict';
 
-    // ─── CONFIG ────────────────────────────────────────────────
     const API_BASE = 'http://127.0.0.1:8000';
 
-    // ─── STATE ──────────────────────────────────────────────────
     let currentUser = null;
     let cart = { items: [], total: 0, user_id: 0, cart_id: 0 };
     let items = [];
@@ -13,7 +11,6 @@
     let currentDetailItemId = null;
     let selectedCartItems = new Set();
 
-    // ─── DOM REFS ──────────────────────────────────────────────
     const authSection = document.getElementById('authSection');
     const mainContent = document.getElementById('mainContent');
     const profileDropdown = document.getElementById('profileDropdown');
@@ -95,7 +92,6 @@
     const statusDot = document.getElementById('statusDot');
     const statusText = document.getElementById('statusText');
 
-    // ─── SHOW/HIDE SHOP NAME FIELD ────────────────────────────
     registerSeller.addEventListener('change', function() {
         const shopNameGroup = document.getElementById('shopNameGroup');
         if (this.value === 'true') {
@@ -105,7 +101,6 @@
         }
     });
 
-    // ─── NOTIFICATIONS ─────────────────────────────────────────
     function showNotification(message, type = 'success') {
         let container = document.getElementById('notification-container');
         if (!container) {
@@ -146,7 +141,6 @@
         }, 5000);
     }
 
-    // ─── API HEALTH ────────────────────────────────────────────
     async function checkHealth() {
         try {
             const res = await fetch(`${API_BASE}/health`, { signal: AbortSignal.timeout(3000) });
@@ -164,7 +158,6 @@
     checkHealth();
     setInterval(checkHealth, 30000);
 
-    // ─── AUTH API ──────────────────────────────────────────────
     async function register(username, password, seller, shopName) {
         const res = await fetch(`${API_BASE}/login/sign-up`, {
             method: 'POST',
@@ -196,7 +189,6 @@
         return res.json();
     }
 
-    // ─── ITEMS API ─────────────────────────────────────────────
     async function fetchItems() {
         try {
             const res = await fetch(`${API_BASE}/item/`);
@@ -249,7 +241,6 @@
         }
     }
 
-    // ─── CART API ──────────────────────────────────────────────
     async function fetchCart() {
         if (!currentUser) return;
         try {
@@ -269,7 +260,6 @@
                 throw new Error('Failed to fetch cart');
             }
             cart = await res.json();
-            // ─── ОЧИЩАЕМ ВЫБОР И ВЫБИРАЕМ ВСЕ ───
             selectedCartItems.clear();
             cart.items.forEach(item => selectedCartItems.add(item.item_id));
             renderCart();
@@ -400,9 +390,6 @@
         }
     }
 
-    // ─── SELECT ALL / DESELECT ALL ────────────────────────────
-    // ─── SELECT ALL / DESELECT ALL ────────────────────────────
-
     function toggleSelectAll() {
         if (!cart.items || cart.items.length === 0) return;
 
@@ -416,12 +403,9 @@
             cart.items.forEach(item => selectedCartItems.add(item.item_id));
         }
 
-        // Перерисовываем корзину
         renderCart();
         updateSelectedTotal();
     }
-
-    // ─── UPDATE SELECTED TOTAL ──────────────────────────────────
 
     function updateSelectedTotal() {
         let selectedTotal = 0;
@@ -445,8 +429,6 @@
             selectAllBtn.style.display = 'none';
         }
     }
-
-    // ─── API — FAVORITES ──────────────────────────────────────────
 
     async function fetchFavorites() {
         if (!currentUser) return;
@@ -531,8 +513,6 @@
         }
     }
 
-    // ─── API — REVIEWS ────────────────────────────────────────────
-
     async function submitReview(itemId, userId, rating, body, author) {
         const res = await fetch(`${API_BASE}/reviews/create`, {
             method: 'POST',
@@ -568,8 +548,6 @@
         }
         return res.json();
     }
-
-    // ─── API — ORDERS ─────────────────────────────────────────────
 
     async function makeOrder(userId, itemIds) {
         const payload = {
@@ -684,8 +662,6 @@
         });
     }
 
-    // ─── API — STATS ────────────────────────────────────────────────
-
     async function fetchStats() {
         if (!currentUser || !currentUser.seller) {
             document.querySelector('.tab-btn[data-tab="stats"]').style.display = 'none';
@@ -757,7 +733,6 @@
     function renderTopItems(itemSalesCount) {
         const container = document.getElementById('topItemsContainer');
         if (!container) {
-            // Если контейнера нет, создаем его
             const statsSection = document.querySelector('.stats-section') || document.getElementById('stats');
             if (statsSection) {
                 const newContainer = document.createElement('div');
@@ -855,8 +830,6 @@
         chart.innerHTML = chartHtml;
     }
 
-    // ─── PRODUCT MODAL ──────────────────────────────────────────
-
     async function openProductModal(itemId) {
         const data = await fetchProductDetails(itemId);
         if (!data) return;
@@ -951,8 +924,6 @@
         });
     }
 
-    // ─── RENDER FUNCTIONS ──────────────────────────────────────
-
     function renderItems() {
         itemGrid.innerHTML = '';
         if (!items || items.length === 0) {
@@ -1013,10 +984,6 @@
             return;
         }
 
-        // ─── УБИРАЕМ АВТОМАТИЧЕСКИЙ ВЫБОР ───
-        // Больше НЕ выбираем все автоматически!
-        // Только если selectedCartItems пустой - тогда выбираем все (только при первом открытии)
-        // Используем флаг, чтобы не перезаписывать выбор пользователя
         if (selectedCartItems.size === 0 && !window._userInteractedWithCart) {
             cart.items.forEach(item => selectedCartItems.add(item.item_id));
         }
@@ -1069,14 +1036,12 @@
                 } else {
                     selectedCartItems.delete(id);
                 }
-                // Обновляем сумму и кнопку
                 updateSelectedTotal();
             });
         });
 
         cartTotal.innerHTML = `<span class="summary">Total: $${total.toFixed(2)}</span>`;
 
-        // ─── ВСЕГДА ПОКАЗЫВАЕМ КНОПКИ ───
         if (cart.items.length > 0) {
             selectAllBtn.style.display = 'inline-block';
             selectAllBtn.textContent = allSelected ? '❌ Deselect All' : '✅ Select All';
@@ -1140,8 +1105,6 @@
             document.querySelector('.tab-btn[data-tab="stats"]').style.display = 'block';
         }
     }
-
-    // ─── AUTH HANDLERS ─────────────────────────────────────────
 
     function showAuthMessage(el, type, msg) {
         el.className = `auth-message ${type}`;
@@ -1240,8 +1203,6 @@
         showNotification('Logged out successfully 👋', 'info');
     }
 
-    // ─── PROFILE HANDLERS ──────────────────────────────────────
-
     async function handleChangeUsername() {
         const newName = newUsername.value.trim();
         const password = editPassword.value.trim();
@@ -1302,8 +1263,6 @@
         }
     }
 
-    // ─── ITEM HANDLERS (Seller) ───────────────────────────────
-
     function showAddItemModal() {
         addItemModal.style.display = 'flex';
         newItemName.value = '';
@@ -1338,8 +1297,6 @@
         }
     }
 
-    // ─── REVIEW HANDLER ────────────────────────────────────────
-
     async function handleSubmitReview() {
         if (!currentUser) {
             showModalMessage(reviewMessage, 'error', 'Please login first');
@@ -1370,8 +1327,6 @@
             showModalMessage(reviewMessage, 'error', err.message);
         }
     }
-
-    // ─── CHECKOUT HANDLER ──────────────────────────────────────
 
     async function handleCheckout() {
         if (!currentUser) {
@@ -1410,8 +1365,6 @@
         }
     }
 
-    // ─── TABS ───────────────────────────────────────────────────
-
     const tabButtons = document.querySelectorAll('.tab-btn');
     const panes = {
         items: document.getElementById('items'),
@@ -1435,8 +1388,6 @@
         if (tabId === 'stats' && currentUser?.seller) fetchStats();
     }
 
-    // ─── DROPDOWN ──────────────────────────────────────────────
-
     profileBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         dropdownContent.classList.toggle('show');
@@ -1455,8 +1406,6 @@
     });
 
     dropdownLogout.addEventListener('click', handleLogout);
-
-    // ─── PRODUCT MODAL EVENTS ──────────────────────────────────
 
     closeProductModal.addEventListener('click', () => {
         productModal.style.display = 'none';
@@ -1482,12 +1431,8 @@
 
     submitReviewBtn.addEventListener('click', handleSubmitReview);
 
-    // ─── CART BUTTONS ──────────────────────────────────────────
-
     selectAllBtn.addEventListener('click', toggleSelectAll);
     checkoutBtn.addEventListener('click', handleCheckout);
-
-    // ─── EVENT LISTENERS ───────────────────────────────────────
 
     loginBtn.addEventListener('click', handleLogin);
     loginPassword.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleLogin(); });
@@ -1529,8 +1474,6 @@
             switchTab(btn.dataset.tab);
         });
     });
-
-    // ─── INIT ──────────────────────────────────────────────────
 
     async function init() {
         const online = await checkHealth();
